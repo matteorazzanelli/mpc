@@ -40,3 +40,22 @@ function (setupDependencies)
         endforeach()
     endif()
 endfunction()
+
+function(setupFlags _FLAGS_)
+    set(DEFAULT_FLAGS "-pedantic -Wall -Wextra -Wcast-align -Wcast-qual \
+        -Wdisabled-optimization -Wformat=2 \
+        -Winit-self -Wlogical-op -Wmissing-include-dirs -Wnoexcept \
+        -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow \
+        -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel \
+        -Wunused")
+
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "9.0")
+        set(DEFAULT_FLAGS "${DEFAULT_FLAGS} -Wpessimizing-move -Wredundant-move")
+    endif()
+
+    set(${_FLAGS_} "${DEFAULT_FLAGS}" PARENT_SCOPE)
+endfunction()
+
+function(AppendTestFlags _FLAGS_)
+    set(${_FLAGS_} "${${_FLAGS_}} -coverage -fsanitize=address -fsanitize=leak -fsanitize=undefined" PARENT_SCOPE)
+endfunction()
