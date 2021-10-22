@@ -1,0 +1,69 @@
+{
+    "Simulation":
+    {
+        "iterations": 100000,
+        "dt": 0.1
+    },
+    "Vehicle":
+    {
+        "_comment": "length and steering start only for bicycle",
+        "length": 3.0,
+        "x_start": 0.0,
+        "y_start": 0.0,
+        "heading_start": 0.0,
+        "steering_start": 0.0
+    },
+    "Control":
+    {
+        "PID_angular":
+        {
+            "kp": 1.0,
+            "kd": 0.0,
+            "ki": 0.0,
+            "max_error": 1.0
+        },
+        "PID_lateral":
+        {
+            "kp": 0.2,
+            "kd": 20.0,
+            "ki": 0.0,
+            "max_error": 1.0
+        },
+        "PurePursuit":
+        {
+
+        },
+        "StanleySteer":
+        {
+
+        },
+        "OSQP":
+        {
+
+        },
+        "IPOPT":
+        {
+
+        }
+    },
+    "Mission":
+    {
+        "Posture":
+        {
+            "x": 10.0,
+            "y": 1.0,
+            "heading": 0.0,
+            "distance_tolerance": 0.05,
+            "angular_tolerance": 0.088
+        },
+        "Path":
+        {
+
+        },
+        "Trajectory":
+        {
+
+        }
+    }
+}
+
