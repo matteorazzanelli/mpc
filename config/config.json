@@ -1,17 +1,19 @@
 {
     "Simulation":
     {
-        "iterations": 100000,
+        "iterations": 10000,
         "dt": 0.1
     },
     "Vehicle":
     {
-        "_comment": "length and steering start only for bicycle",
-        "length": 3.0,
-        "x_start": 0.0,
-        "y_start": 0.0,
-        "heading_start": 0.0,
-        "steering_start": 0.0
+        "_comment": "bicycle is rear wheel drive system",
+        "_comment2": "max steering is 30° (0.53 rad)",
+        "length": 1.0,
+        "x": 0.0,
+        "y": 0.0,
+        "heading": 0.0,
+        "steering": 0.0,
+        "max_control": 0.53
     },
     "Control":
     {
@@ -20,14 +22,14 @@
             "kp": 1.0,
             "kd": 0.0,
             "ki": 0.0,
-            "max_error": 1.0
+            "max_integral_error": 1.0
         },
         "PID_lateral":
         {
             "kp": 0.2,
             "kd": 20.0,
             "ki": 0.0,
-            "max_error": 1.0
+            "max_integral_error": 10.0
         },
         "PurePursuit":
         {

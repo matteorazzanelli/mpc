@@ -41,17 +41,18 @@ namespace control {
     double err_d = (error_ - last_error_) / dt_;
     last_error_ = error_;
     integral_error_ += error_ * dt_;
-    integral_error_ = integral_error_ > max_error_ ? max_error_ : integral_error_;
-    integral_error_ = integral_error_ < -max_error_ ? -max_error_ : integral_error_;
+    integral_error_ = fabs(integral_error_) > max_integral_error_ ? utils::math::sign(integral_error_) * max_integral_error_ : integral_error_;
+    double control = (kp_*error_ + kd_*err_d + ki_*integral_error_);
+    control = fabs(control) > max_control_ ? utils::math::sign(control) * max_control_ : control;
     if (control_type_ == ControlType::ANGULAR) {
       return utils::types::Control{
         .v = 0.01,
-        .w = (kp_*error_ + kd_*err_d + ki_*integral_error_)
+        .w = control
       };
     }
     if (control_type_ == ControlType::LINEAR) {
       return utils::types::Control{
-        .v = (kp_*error_ + kd_*err_d + ki_*integral_error_),
+        .v = control,
         .w = 0.01
       };
     }

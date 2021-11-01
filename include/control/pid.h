@@ -9,7 +9,8 @@ namespace control {
       double ki_;
       double error_;
       double integral_error_;
-      double max_error_;
+      double max_integral_error_;
+      double max_control_;
       double last_error_;
       ControlType control_type_;
       PIDType pid_type_;

@@ -59,20 +59,21 @@ namespace utils {
       config.simulation.dt = json["Simulation"]["dt"].asDouble();
 
       config.vehicle.length = json["Vehicle"]["length"].asDouble();
-      config.vehicle.x_start = json["Vehicle"]["x"].asDouble();
-      config.vehicle.y_start = json["Vehicle"]["y"].asDouble();
-      config.vehicle.heading_start = json["Vehicle"]["heading"].asDouble();
-      config.vehicle.steering_start = json["Vehicle"]["steering"].asDouble();
+      config.vehicle.x = json["Vehicle"]["x"].asDouble();
+      config.vehicle.y = json["Vehicle"]["y"].asDouble();
+      config.vehicle.heading = json["Vehicle"]["heading"].asDouble();
+      config.vehicle.steering = json["Vehicle"]["steering"].asDouble();
+      config.vehicle.max_control = json["Vehicle"]["max_control"].asDouble();
       
       config.pid_ang.kp = json["Control"]["PID_angular"]["kp"].asDouble();
       config.pid_ang.kd = json["Control"]["PID_angular"]["kd"].asDouble();
       config.pid_ang.ki = json["Control"]["PID_angular"]["ki"].asDouble();
-      config.pid_ang.max_err = json["Control"]["PID_angular"]["max_error"].asDouble();
+      config.pid_ang.max_integral_error = json["Control"]["PID_angular"]["max_integral_error"].asDouble();
 
       config.pid_lat.kp = json["Control"]["PID_lateral"]["kp"].asDouble();
       config.pid_lat.kd = json["Control"]["PID_lateral"]["kd"].asDouble();
       config.pid_lat.ki = json["Control"]["PID_lateral"]["ki"].asDouble();
-      config.pid_lat.max_err = json["Control"]["PID_lateral"]["max_error"].asDouble();
+      config.pid_lat.max_integral_error = json["Control"]["PID_lateral"]["max_integral_error"].asDouble();
 
       config.posture.x = json["Mission"]["Posture"]["x"].asDouble();
       config.posture.y = json["Mission"]["Posture"]["y"].asDouble();

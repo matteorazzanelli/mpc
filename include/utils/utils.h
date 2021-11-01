@@ -80,16 +80,17 @@ namespace utils {
     };
     struct Vehicle {
       double length;
-      double x_start;
-      double y_start;
-      double heading_start;
-      double steering_start;
+      double x;
+      double y;
+      double heading;
+      double steering;
+      double max_control;
     };
     struct PIDControl {
       double kp;
       double kd;
       double ki;
-      double max_err;
+      double max_integral_error;
     };
     struct PostureMission {
       double x;
@@ -108,25 +109,3 @@ namespace utils {
     Config parseJson(const std::string &config_file);
   }
 }
-
-// std::vector<double> Proxima, Pollini;
-// std::array<double, 2> Pgoal = {10.0, 1.0};
-// std::array<double, 2> Pstart = {0.0, 0.0};
-// std::vector<double> degrees;
-// for (size_t i = 0; i < 360; i ++) {
-//   Pollini.push_back(
-//     utils::math::modPi(
-//     utils::math::modPi(atan2(Pgoal.at(1) - Pstart.at(1), Pgoal.at(0) - Pstart.at(0))) - 
-//     utils::math::modPi(i)
-//   ));
-//   Proxima.push_back(
-//     utils::math::shortestAngularDistance(
-//       i,
-//       atan2(Pgoal.at(1) - Pstart.at(1), Pgoal.at(0) - Pstart.at(0))
-//   ));
-//   degrees.push_back(i);
-// }
-// plt::named_plot("Pollini",degrees, Pollini,"r--");
-// plt::named_plot("Proxima",degrees, Proxima,"b--");
-// plt::legend();
-// plt::show();
