@@ -1,6 +1,7 @@
 
 #include "simulator/simulator.h"
 #include <limits>
+#include <glog/logging.h>
 
 namespace simulator {
   Simulator::Simulator(const utils::config::Config& config) : config_(config) {}
@@ -18,23 +19,24 @@ namespace simulator {
       .steering_angle = 0.0
       };
     }
+    else {
+      LOG(ERROR) << "Mission type not supported.";
+    }
     utils::types::Pose robot_pose;
     double eulerDist_w = std::numeric_limits<double>::max();
-    utils::types::Path result;
+    utils::types::Path result(config_.simulation.iterations);
     
     for (size_t i = 0; i < config_.simulation.iterations; i ++) {
       robot_pose = model->getState();
       controller->updateControlError(robot_pose, goal);
       utils::types::Control control = controller->updateControl();
       robot_pose = model->updateState(control);
-      if (utils::math::eulerDistance(robot_pose.position,goal.position) < config_.posture.distance_tolerance)
-        break;
-      result.push_back(utils::types::PathPoint{
+      result[i] = utils::types::PathPoint{
         .pose = robot_pose,
         .s = 0.0,
         .k = 0.0,
         .u = control
-      });
+      };
     }
 
     return result;
