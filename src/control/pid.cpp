@@ -4,26 +4,10 @@
 
 namespace control {
   Pid::Pid(const double& kp, const double& kd, const double& ki, 
-          const double& max_err, const double & dt, utils::types::PIDType pid_type, utils::types::ControlType control_type) : Controller(dt),
-    kp_(kp), kd_(kd), ki_(ki), max_error_(max_err), error_(0.0), last_error_(0.0), integral_error_(0.0), 
+          const double& max_integral_error, const double& max_control, const double & dt, 
+          utils::types::PIDType pid_type, utils::types::ControlType control_type) : Controller(dt),
+    kp_(kp), kd_(kd), ki_(ki), max_integral_error_(max_integral_error), max_control_(max_control), error_(0.0), last_error_(0.0), integral_error_(0.0), 
     pid_type_(pid_type), control_type_(control_type) {}
-
-  bool Pid::resetErrors() {
-    error_ = 0.0;
-    last_error_ = 0.0;
-    integral_error_ = 0.0;
-
-    return true;
-  }
-
-  bool Pid::setTuningParameters(const utils::config::PIDControl& parameters) {
-    kp_ = parameters.kp;
-    kd_ = parameters.kd;
-    ki_ = parameters.ki;
-    max_error_ = parameters.max_err;
-
-    return true;
-  }
 
   void Pid::updateControlError(const utils::types::Pose& pose, const utils::types::Pose& target) {
     if (pid_type_ == PIDType::ANGULAR) {
