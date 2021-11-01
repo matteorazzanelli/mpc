@@ -4,8 +4,6 @@
 #include "utils/utils.h"
 #include "model/vehicle.h"
 #include "control/control.h"
-// #include "control/pid.h"
-// // #include "simulator/task_manager.h"
 
 namespace simulator {
   class Simulator {

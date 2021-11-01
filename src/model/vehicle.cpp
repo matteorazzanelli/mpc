@@ -23,18 +23,18 @@ namespace vehicle {
     // unicycle integration
     state_.position.x = state_.position.x + input.v * cos(state_.heading) * dt_;
     state_.position.y = state_.position.y + input.v * sin(state_.heading) * dt_;
-    state_.heading = state_.heading + input.w * dt_;
+    state_.heading = utils::math::normalizeAngle(state_.heading + input.w * dt_);
     // update input
     input_ = input;
     return state_;
   }
 
   ::utils::types::Pose Bicycle::updateState(const ::utils::types::Control& input) {
-    // bicycle integration
+    // bicycle integration (x,y) is of the rear axis
     state_.position.x = state_.position.x + input.v * cos(state_.heading) * dt_;
     state_.position.y = state_.position.y + input.v * sin(state_.heading) * dt_;
-    state_.heading = state_.heading + input.v * tan(state_.steering_angle) / length_ * dt_;
-    state_.steering_angle = state_.steering_angle + input_.w * dt_;
+    state_.heading = utils::math::normalizeAngle(state_.heading + input.v * tan(state_.steering_angle) / length_ * dt_);
+    state_.steering_angle = state_.steering_angle + input.w * dt_;
     // update input
     input_ = input;
     return state_;

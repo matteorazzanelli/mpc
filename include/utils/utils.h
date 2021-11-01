@@ -71,6 +71,12 @@ namespace utils {
     double interpolateAnglesLinear(double x, double x1, double x2, double y1, double y2);
 
     double slerp(double m, double alpha1, double alpha2);
+
+    template <typename T> int sign(T val) {
+      return (T(0) < val) - (val < T(0));
+    }
+
+    double normalizeAngle(double angle);
   }
 
   namespace config {
