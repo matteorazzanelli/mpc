@@ -19,15 +19,15 @@
     {
         "PID_angular":
         {
-            "kp": 1.0,
-            "kd": 0.0,
+            "kp": 0.1,
+            "kd": 10.0,
             "ki": 0.0,
             "max_integral_error": 1.0
         },
         "PID_lateral":
         {
-            "kp": 0.2,
-            "kd": 20.0,
+            "kp": 0.1,
+            "kd": 10.0,
             "ki": 0.0,
             "max_integral_error": 10.0
         },
