@@ -64,7 +64,7 @@ namespace utils {
       return atan2(to.y - from.y, to.x - from.x);
     }
     static inline double lateralDistance(const utils::types::Pose& from, const utils::types::Pose& to) {
-      return (from.position.x - to.position.x) * sin(to.heading) - (from.position.y - to.position.y) * cos(to.heading);
+      return (from.position.x - to.position.x) * sin(from.heading) - (from.position.y - to.position.y) * cos(from.heading);
     }
     double interpolateLinear(double x, double x1, double x2, double y1, double y2);
 
