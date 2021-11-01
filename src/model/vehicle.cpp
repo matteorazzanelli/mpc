@@ -1,31 +1,23 @@
 #include "model/vehicle.h"
 #include <math.h>
-namespace vehicle {
-  Model::Model(const double& dt) : dt_(dt) {
-    input_.v = 0.0;
-    input_.w = 0.0;
-    state_.position.x = 0.0;
-    state_.position.y = 0.0;
-    state_.heading = 0.0;
-    state_.steering_angle = 0.0;
-    input_.v = 0.0;
-    input_.w = 0.0;
-  }
 
-  Model::Model(const double& dt, const Pose& state) : 
-    dt_(dt), state_(state) {
+namespace vehicle {
+  Model::Model(const utils::config::Config& config) {
     input_.v = 0.0;
     input_.w = 0.0;
+    state_.position.x = config.vehicle.x;
+    state_.position.y = config.vehicle.y;
+    state_.heading = config.vehicle.heading;
+    state_.steering_angle = config.vehicle.steering;
+    dt_ = config.simulation.dt;
   }
 
   ::utils::types::Pose Model::getState() {return state_;}
   ::utils::types::Control Model::getInput() {return input_;}
 
-  Unicycle::Unicycle(const double &dt) : Model(dt){}
-  Unicycle::Unicycle(const double &dt, const Pose& state) : Model(dt, state) {}
+  Unicycle::Unicycle(const utils::config::Config& config) : Model(config) {}
 
-  Bicycle::Bicycle(const double &dt) : Model(dt){}
-  Bicycle::Bicycle(const double &dt, const Pose& state) : Model(dt, state) {}
+  Bicycle::Bicycle(const utils::config::Config& config) : Model(config), length_(config.vehicle.length) {}
 
   ::utils::types::Pose Unicycle::updateState(const ::utils::types::Control& input) {
     // unicycle integration

@@ -7,8 +7,7 @@ namespace vehicle {
 
   class Model {
     public:
-      Model(const double& dt);
-      Model(const double& dt, const Pose& state);
+      Model(const utils::config::Config& config);
       virtual Pose updateState(const Control& input) = 0;
       Pose getState();
       Control getInput();
@@ -20,8 +19,7 @@ namespace vehicle {
 
   class Unicycle : public Model {
     public:
-      Unicycle(const double &dt);
-      Unicycle(const double &dt, const Pose& state);
+      Unicycle(const utils::config::Config& config);
       Pose updateState(const Control& input);
   };
 
@@ -29,8 +27,7 @@ namespace vehicle {
     private:
       double length_;
     public:
-      Bicycle(const double &dt);
-      Bicycle(const double &dt, const Pose& state);
+      Bicycle(const utils::config::Config& config);
       Pose updateState(const Control& input);
   };
 }
