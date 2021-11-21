@@ -22,20 +22,20 @@ namespace simulator {
     else {
       LOG(ERROR) << "Mission type not supported.";
     }
-    utils::types::Pose robot_pose;
-    double eulerDist_w = std::numeric_limits<double>::max();
+
     utils::types::Path result(config_.simulation.iterations);
-    
     for (size_t i = 0; i < config_.simulation.iterations; i ++) {
-      robot_pose = model->getState();
-      controller->updateControlError(robot_pose, goal);
+
+      controller->updateControlError(model, goal);
+      
       utils::types::Control control = controller->updateControl();
-      robot_pose = model->updateState(control);
+      
+      utils::types::Pose robot_pose = model->updateState(control);
+      
       result[i] = utils::types::PathPoint{
         .pose = robot_pose,
         .s = 0.0,
-        .k = 0.0,
-        .u = control
+        .k = 0.0
       };
     }
 

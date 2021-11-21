@@ -9,14 +9,14 @@ namespace control {
     kp_(kp), kd_(kd), ki_(ki), max_integral_error_(max_integral_error), max_control_(max_control), error_(0.0), last_error_(0.0), integral_error_(0.0), 
     pid_type_(pid_type), control_type_(control_type) {}
 
-  void Pid::updateControlError(const utils::types::Pose& pose, const utils::types::Pose& target) {
+  void Pid::updateControlError(vehicle::Model* model, const utils::types::Pose& target) {
     if (pid_type_ == PIDType::ANGULAR) {
-      double losAngle = utils::math::losAngle(pose.position, target.position);
-      double angDist = utils::math::shortestAngularDistance(pose.heading, losAngle);
+      double losAngle = utils::math::losAngle(model->getState().position, target.position);
+      double angDist = utils::math::shortestAngularDistance(model->getState().heading, losAngle);
       error_ = angDist;
     }
     if (pid_type_ == PIDType::LATERAL) {
-      double latDist = utils::math::lateralDistance(pose, target);
+      double latDist = utils::math::lateralDistance(model->getState(), target);
       error_ = latDist;
     }
   }

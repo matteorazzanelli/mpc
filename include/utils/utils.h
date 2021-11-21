@@ -10,6 +10,10 @@ namespace utils {
     struct Position {
       double x = 0.0;
       double y = 0.0;
+      Position operator+(const Position &p) const;
+      Position operator-(const Position &p) const;
+      Position operator*(const Position &p) const;
+      Position operator/(const Position &p) const;
     };
     struct Pose {
       Position position;
@@ -32,7 +36,6 @@ namespace utils {
       Pose pose;
       double s; // distance from the beginning, (i.e. curvilinear abscissa)
       double k; // curvature
-      Control u;
     };
     struct TrajPoint {
       PathPoint path_point;
@@ -40,11 +43,10 @@ namespace utils {
     };
     using Path = std::vector<PathPoint>;
     using Traj = std::vector<TrajPoint>;
-    using SimResult = std::variant<Path, Traj>;
   }
 
   namespace math {
-    constexpr double EPSILON_TOLERANCE = 1E-9;
+    constexpr double EPSILON_TOLERANCE = 1E-6;
     static inline double shortestAngularDistance(const double &from, const double &to) {
       double a = fmod(fmod(to - from, 2.0 * M_PI) + 2.0 * M_PI, 2.0 * M_PI);
       if (a > M_PI)
@@ -77,6 +79,18 @@ namespace utils {
     }
 
     double normalizeAngle(double angle);
+
+    static inline double pointLineDistance(double a, double b, double c, double lx, double ly) {
+      return std::fabs(a*lx+b*ly+c)/std::sqrt(a*a+b*b);
+    }
+  }
+
+  namespace path {
+    using namespace utils::types;
+    void addCurvilinearDistance(Path& path);
+    void addCurvature(Path& path);
+    const PathPoint* closestPoint(size_t &index, const Position& point, const Path& path);
+    const PathPoint* lookaheadPoint(const PathPoint& start, const PathPoint& end, const Position& robot_position, const Path& path, double ld, const PathPoint& last_lp);
   }
 
   namespace config {
@@ -89,7 +103,7 @@ namespace utils {
       double x;
       double y;
       double heading;
-      double steering;
+      double steering_angle;
       double max_control;
     };
     struct PIDControl {
@@ -98,6 +112,10 @@ namespace utils {
       double ki;
       double max_integral_error;
     };
+    struct PPControl {
+      double ld;
+      double k;
+    };
     struct PostureMission {
       double x;
       double y;
@@ -105,13 +123,24 @@ namespace utils {
       double distance_tolerance;
       double angular_tolerance;
     };
+    struct PathMission {
+
+    };
+    struct TrajMission {
+
+    };
     struct Config {
       Simulation simulation;
       Vehicle vehicle;
       PIDControl pid_ang;
       PIDControl pid_lat;
+      PPControl pure_pursuit;
       PostureMission posture;
+      PathMission path;
+      TrajMission traj;
     };
+
     Config parseJson(const std::string &config_file);
+    utils::config::TrajMission toTraj(const utils::config::PostureMission& mission);
   }
 }

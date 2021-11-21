@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "utils/utils.h"
-#include "model/vehicle.h"
 #include "control/control.h"
 
 namespace simulator {
