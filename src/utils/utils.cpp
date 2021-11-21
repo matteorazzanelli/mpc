@@ -4,7 +4,24 @@
 #include <filesystem>
 #include <fstream>
 
+using namespace utils::types;
+
 namespace utils {
+  namespace types {
+    Position Position::operator+(const Position &p) const {
+      return {.x = x + p.x, .y = y + p.y};
+    }
+    Position Position::operator-(const Position &p) const {
+      return {.x = x - p.x, .y = y - p.y};
+    }
+    Position Position::operator*(const Position &p) const {
+      return {.x = x * p.x, .y = y * p.y};
+    }
+    Position Position::operator/(const Position &p) const {
+      return {.x = x / p.x, .y = y / p.y};
+    }
+  }
+  
   namespace math {
     double interpolateLinear(double x, double x1, double x2, double y1, double y2) {
       CHECK_GT(x2, x1) << "Provided out of order interpolation boundaries: " << x1 << " >= " << x2;
@@ -44,18 +61,100 @@ namespace utils {
     }
 
     double normalizeAngle(double angle) {
-      while (angle > M_PI)
-      {
+      while (angle > M_PI) {
         angle -= 2.0 * M_PI;
       }
-      while (angle < -M_PI)
-      {
+      while (angle < -M_PI) {
         angle += 2.0 * M_PI;
       }
       return angle;
     }
-
   }
+  
+  namespace path {
+    void addCurvilinearDistance(Path& path) {
+      CHECK_GE(path.size(),1) << "Path must contain at least 1 element.";
+      double distance = 0.0;
+      path[0].s = distance;
+      for (size_t i = 1; i < path.size(); i ++) {
+        path[i].s = distance + utils::math::eulerDistance(path[i-1].pose.position, path[i].pose.position);
+      }
+    }
+
+    void addCurvature(Path& path) {
+      CHECK_GE(path.size(),3) << "Path must contain at least 3 elements.";
+      path.front().k = 0.0;
+      path.back().k = 0.0;
+      double Ax, Ay, Bx, By, Cx, Cy, AB, BC, CA, area;
+      for(size_t i = 1; i < path.size()-1; i ++) {
+        // find area of the triangle
+        Ax = path[i-1].pose.position.x;
+        Ay = path[i-1].pose.position.y;
+        Bx = path[i].pose.position.x;
+        By = path[i].pose.position.y;
+        Cx = path[i+1].pose.position.x;
+        Cy = path[i+1].pose.position.y;
+        AB = utils::math::eulerDistance(path[i-1].pose.position, path[i].pose.position);
+        BC = utils::math::eulerDistance(path[i].pose.position, path[i+1].pose.position);
+        CA = utils::math::eulerDistance(path[i+1].pose.position, path[i-1].pose.position);
+        // compute area from determinant
+        area = 0.5 * std::fabs(Ax*(By-Cy) + Bx*(Cy - Ay) + Cx*(Ay - By));
+        if(area < utils::math::EPSILON_TOLERANCE)
+          path[i].k = 0.0; // points are colinear
+        else
+          path[i].k = 4 * area / (AB * BC * CA);
+      }
+    }
+
+    const PathPoint* closestPoint(size_t &index, const Position& point, const Path& path) {
+      CHECK_GE(index, 0) << "Negative index not alloews.";
+      double closest_distance = std::numeric_limits<double>::max();
+      const PathPoint* pp; 
+      for (size_t i = index; i < path.size(); i++) {
+        double wx = path.at(i).pose.position.x;
+        double wy = path.at(i).pose.position.y;
+        double current_closest_distance = std::pow((point.x - wx),2) + pow((point.y - wy),2);
+        if (current_closest_distance < closest_distance) {
+          closest_distance = current_closest_distance;
+          index = i;
+          pp = &path.at(i);
+        }
+      }
+      return pp;
+    }
+
+    const PathPoint* lookaheadPoint(const PathPoint& start, const PathPoint& end, const Position& robot_position, const Path& path, double ld, const PathPoint& last_lp) {
+      // Check intersection segment circumference
+      double start_x, start_y, end_x, end_y, c_x, c_y;
+      start_x = start.pose.position.x;
+      start_y = start.pose.position.y;
+      end_x = end.pose.position.x;
+      end_y = end.pose.position.y;
+      c_x = robot_position.x;
+      c_y = robot_position.y;
+      double a = std::pow(end_x - start_x,2) + std::pow(end_y - start_y,2);
+      double b = start_y * ( (end_y - start_y) + c_y) - end_y * c_y + start_x * ( (end_y - start_x) + c_x) - end_x * c_x;
+      double delta = std::pow(end_x-start_x,2) * (ld*ld - c_y*c_y) + 
+                    std::pow(end_y-start_y,2) * (ld*ld - c_y*c_x) + 
+                    2*start_x*start_y*c_x*c_y + 2*end_x*end_y*c_x*c_y - 
+                    std::pow(start_x*start_x*end_y*end_y - end_x*end_x*start_y*start_y,2) + 
+                    2*start_x*end_y*(-c_y*(end_x-start_x+c_x) + c_x*(end_y-start_y)) + 
+                    2*start_y*end_x*(-c_x*(end_y-start_y+c_y) + c_y*(end_x-start_x));
+      CHECK_GE(delta, 0) << "No intersection.";
+      delta = std::sqrt(delta);
+      double t1 = (-b + delta) / (2 * a);
+      double t2 = (-b - delta) / (2 * a);
+      const PathPoint* pp;
+      if (t1 >= 0 && t1 <= 1)
+        pp = &end; // FIXME should be an interpolation between start and end
+      else if (t2 >= 0 && t2 <= 1)
+        pp = &start; // FIXME should be an interpolation between end and start
+      else 
+        pp = &last_lp;
+      return pp;
+    }
+  }
+  
   namespace config {
     Config parseJson(const std::string &config_file) {
       // Read file
@@ -73,7 +172,7 @@ namespace utils {
       config.vehicle.x = json["Vehicle"]["x"].asDouble();
       config.vehicle.y = json["Vehicle"]["y"].asDouble();
       config.vehicle.heading = json["Vehicle"]["heading"].asDouble();
-      config.vehicle.steering = json["Vehicle"]["steering"].asDouble();
+      config.vehicle.steering_angle = json["Vehicle"]["steering_angle"].asDouble();
       config.vehicle.max_control = json["Vehicle"]["max_control"].asDouble();
       
       config.pid_ang.kp = json["Control"]["PID_angular"]["kp"].asDouble();
@@ -85,6 +184,9 @@ namespace utils {
       config.pid_lat.kd = json["Control"]["PID_lateral"]["kd"].asDouble();
       config.pid_lat.ki = json["Control"]["PID_lateral"]["ki"].asDouble();
       config.pid_lat.max_integral_error = json["Control"]["PID_lateral"]["max_integral_error"].asDouble();
+
+      config.pure_pursuit.k = json["Control"]["PurePursuit"]["k"].asDouble();
+      config.pure_pursuit.ld = json["Control"]["PurePursuit"]["ld"].asDouble();
 
       config.posture.x = json["Mission"]["Posture"]["x"].asDouble();
       config.posture.y = json["Mission"]["Posture"]["y"].asDouble();

@@ -12,13 +12,14 @@
         "x": 0.0,
         "y": 0.0,
         "heading": 0.0,
-        "steering": 0.0,
+        "steering_angle": 0.0,
         "max_control": 0.53
     },
     "Control":
     {
         "PID_angular":
         {
+            "_comment": "bicycle (0.1, 10, 0); unicycle (1, 0, 0)",
             "kp": 0.1,
             "kd": 10.0,
             "ki": 0.0,
@@ -26,6 +27,7 @@
         },
         "PID_lateral":
         {
+            "_comment": "bicycle (0.1, 10, 0); unicycle (1, 0, 0)",
             "kp": 0.1,
             "kd": 10.0,
             "ki": 0.0,
@@ -33,7 +35,8 @@
         },
         "PurePursuit":
         {
-
+            "ld": 0.02,
+            "k": 1.0
         },
         "StanleySteer":
         {
