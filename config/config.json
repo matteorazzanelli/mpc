@@ -35,7 +35,7 @@
         },
         "PurePursuit":
         {
-            "ld": 0.02,
+            "ld": 1.0,
             "k": 1.0
         },
         "StanleySteer":

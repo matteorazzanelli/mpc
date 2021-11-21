@@ -29,7 +29,7 @@ namespace control {
     // Find the path point closest to the vehicle
     const utils::types::PathPoint* start = utils::path::closestPoint(closest_index_, robot_pose.position, path_);
     // Find the lookahead point
-    for(size_t i = closest_index_; i < path_.size(); i ++){
+    for(size_t i = closest_index_; i < path_.size()-1; i ++){
       const utils::types::PathPoint* goal = utils::path::lookaheadPoint(path_.at(i), path_.at(i+1), robot_pose.position, path_, adaptive_ld, last_lokahead_point_);
       if(goal) {
         last_lokahead_point_ = *goal;
