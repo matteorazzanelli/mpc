@@ -37,12 +37,11 @@ set(EXEC_NAME main)
 list(APPEND ${LIBRARY_NAME}_SRCS
   src/utils/utils.cpp
   src/model/vehicle.cpp
-  # src/control/control.cpp
+  src/control/pid.cpp
+  src/control/pure_pursuit.cpp
+  # src/control/stanley_steer.cpp
   # src/control/nmpc_ipopt_wrapper.cpp
   # src/control/mpc_osqp_wrapper.cpp
-  src/control/pid.cpp
-  # src/control/pure_pursuit.cpp
-  # src/control/stanley_steer.cpp
   src/simulator/simulator.cpp
 )
 list(APPEND ${EXEC_NAME}_SRCS
