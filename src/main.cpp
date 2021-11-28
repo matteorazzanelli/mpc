@@ -70,8 +70,16 @@ int main(int argc, char *argv[]) {
   Path uni_pidlat = simulation.run(unicycle_pid_lat, pid_lat, "Posture");
   Path bi_pidang = simulation.run(bicycle_pid_ang, pid_ang, "Posture");
   Path bi_pidlat = simulation.run(bicycle_pid_lat, pid_lat, "Posture");
+  std::cout<<"##################### UNI"<<std::endl;
   Path uni_pp = simulation.run(unicycle_pp, pp, "Posture");
-  // Path bi_pp = simulation.run(bicycle_pp, pp, "Posture");
+  std::cout<<"--------------------------------------"<<std::endl;
+  std::cout<<"--------------------------------------"<<std::endl;
+  std::cout<<"--------------------------------------"<<std::endl;
+  std::cout<<"--------------------------------------"<<std::endl;
+  std::cout<<"--------------------------------------"<<std::endl;
+  std::cout<<"##################### BI"<<std::endl;
+  pp->init(path);
+  Path bi_pp = simulation.run(bicycle_pp, pp, "Posture");
 
   // Store
   std::vector<double> uni_pidang_x(config.simulation.iterations);
@@ -98,17 +106,19 @@ int main(int argc, char *argv[]) {
     bi_pidlat_y[i] = bi_pidlat[i].pose.position.y;
     uni_pp_x[i] = uni_pp[i].pose.position.x;
     uni_pp_y[i] = uni_pp[i].pose.position.y;
-    // bi_pp_x[i] = bi_pp[i].pose.position.x;
-    // bi_pp_y[i] = bi_pp[i].pose.position.y;
+    bi_pp_x[i] = bi_pp[i].pose.position.x;
+    bi_pp_y[i] = bi_pp[i].pose.position.y;
   }
   std::vector<double> goal_x(1,config.posture.x), goal_y(1,config.posture.y);
   std::vector<double> start_x(1,config.vehicle.x), start_y(1,config.vehicle.y);
 
   // Plot
   plt::named_plot("Unicycle Angular PID",uni_pidang_x, uni_pidang_y,"r--");
-  plt::named_plot("Unicycle Lateral PID",uni_pidlat_x, uni_pidlat_y,"b--");
-  plt::named_plot("Bicycle Angular PID",bi_pidang_x, bi_pidang_y,"g--");
-  plt::named_plot("Bicycle Lateral PID",bi_pidlat_x, bi_pidlat_y,"m--");
+  plt::named_plot("Unicycle Lateral PID",uni_pidlat_x, uni_pidlat_y,"g--");
+  plt::named_plot("Bicycle Angular PID",bi_pidang_x, bi_pidang_y,"b--");
+  plt::named_plot("Bicycle Lateral PID",bi_pidlat_x, bi_pidlat_y,"y--");
+  plt::named_plot("Unicycle Pure Pursuit",uni_pp_x, uni_pp_y,"m--");
+  plt::named_plot("Bicycle Pure Pursuit",bi_pp_x, bi_pp_y,"c--");
   plt::named_plot("Goal",goal_x,goal_y,"ro");
   plt::named_plot("Start",start_x,start_y,"bo");
   plt::title("AGV position");
