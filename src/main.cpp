@@ -113,10 +113,10 @@ int main(int argc, char *argv[]) {
   std::vector<double> start_x(1,config.vehicle.x), start_y(1,config.vehicle.y);
 
   // Plot
-  plt::named_plot("Unicycle Angular PID",uni_pidang_x, uni_pidang_y,"r--");
-  plt::named_plot("Unicycle Lateral PID",uni_pidlat_x, uni_pidlat_y,"g--");
-  plt::named_plot("Bicycle Angular PID",bi_pidang_x, bi_pidang_y,"b--");
-  plt::named_plot("Bicycle Lateral PID",bi_pidlat_x, bi_pidlat_y,"y--");
+  // plt::named_plot("Unicycle Angular PID",uni_pidang_x, uni_pidang_y,"r--");
+  // plt::named_plot("Unicycle Lateral PID",uni_pidlat_x, uni_pidlat_y,"g--");
+  // plt::named_plot("Bicycle Angular PID",bi_pidang_x, bi_pidang_y,"b--");
+  // plt::named_plot("Bicycle Lateral PID",bi_pidlat_x, bi_pidlat_y,"y--");
   plt::named_plot("Unicycle Pure Pursuit",uni_pp_x, uni_pp_y,"m--");
   plt::named_plot("Bicycle Pure Pursuit",bi_pp_x, bi_pp_y,"c--");
   plt::named_plot("Goal",goal_x,goal_y,"ro");

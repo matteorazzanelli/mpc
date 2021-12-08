@@ -140,7 +140,7 @@ namespace utils {
                     std::pow(start_x*start_x*end_y*end_y - end_x*end_x*start_y*start_y,2) + 
                     2*start_x*end_y*(-c_y*(end_x-start_x+c_x) + c_x*(end_y-start_y)) + 
                     2*start_y*end_x*(-c_x*(end_y-start_y+c_y) + c_y*(end_x-start_x));
-      CHECK_GE(delta, 0) << "No intersection.";
+      // CHECK_GE(delta, 0) << "No intersection.";
       delta = std::sqrt(delta);
       double t1 = (-b + delta) / (2 * a);
       double t2 = (-b - delta) / (2 * a);

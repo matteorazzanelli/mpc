@@ -10,6 +10,8 @@ namespace control {
       double k_;
       size_t closest_index_ = 0;
       double curvature_ = 0.0;
+      double dt_ = 0.1;
+      double last_maneuver_ = 0.0;
       utils::types::Path path_;
       utils::types::PathPoint last_lokahead_point_;
     public:

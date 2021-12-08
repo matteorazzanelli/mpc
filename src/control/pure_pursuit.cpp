@@ -11,14 +11,23 @@ namespace control {
     last_lokahead_point_ = path.front();
     closest_index_ = 0;
     curvature_ = 0.0;
+    last_maneuver_ = 0.0;
   }
   
   Control PurePursuit::updateControl() {
+    double steering_angle = std::atan2(curvature_,1.0);
+    double omega = (steering_angle - last_maneuver_) / dt_;
+    double max_omega = 0.53; // qui ci va max_control_
+    omega = fabs(omega) > max_omega ? utils::math::sign(omega)*max_omega : omega;
+    std::cout<<omega<<" "<<steering_angle<<" "<<last_maneuver_<<std::endl;
     // We control the (steering) angular rate: omega = v * curvature
-    return utils::types::Control {
+    auto control = utils::types::Control {
       .v = 0.01,
-      .w = 0.01 * curvature_
+      // .w = omega // biciclo
+      .w = 0.01 * curvature_ + omega // FIXME: omega shuould be of the previous step not current
     };
+    last_maneuver_ = steering_angle;
+    return control;
   }
 
   void PurePursuit::updateControlError(vehicle::Model* model, const utils::types::Pose& target) {
@@ -51,14 +60,18 @@ namespace control {
     // std::cout<<sign<<" "<<side<<" "<<x<<std::endl;
     
     // Calculate the curvature of the arc to the lookahead point
-    curvature_ = std::min(sign * (2.0 * x / std::pow(adaptive_ld,2)), 0.02); // = 1/R
-    std::cout<<curvature_<<" ";
+    curvature_ = sign * (2.0 * x / std::pow(adaptive_ld,2)); // = 1/R
+    // double L = 1.0;
+    // double steering_angle_rate = ((L*curvature_/x) / (1+std::pow(L*curvature_,2))) * dt_ ;
+
+    // std::cout<<curvature_<<" ";
 
     // Alternative
     // double desired_yaw = atan2((last_lokahead_point_.pose.position.y - robot_pose.position.y),(last_lokahead_point_.pose.position.x - robot_pose.position.x));
     // double diff_orientation = utils::math::shortestAngularDistance(robot_pose.heading,desired_yaw);
     // curvature_ = std::atan2(2.0 * std::sin(diff_orientation) / adaptive_ld, 1.0);
-    // std::cout<<curvature_<<std::endl;
+    // std::cout<<curvature_<<" "<<steering_angle_rate<<std::endl;
+    // curvature_ = steering_angle_rate;
 
     // R    = ld/(2*sin(alpha))
     // 1/R  = (2*sin(alpha))/ld = (2*x)/(ld**2)
