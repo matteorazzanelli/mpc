@@ -17,17 +17,29 @@
     },
     "Control":
     {
-        "PID_angular":
+        "PID_angular_unicycle":
         {
-            "_comment": "bicycle (0.1, 10, 0); unicycle (1, 0, 0)",
+            "kp": 1.0,
+            "kd": 0.0,
+            "ki": 0.0,
+            "max_integral_error": 1.0
+        },
+        "PID_lateral_unicycle":
+        {
+            "kp": 1.0,
+            "kd": 0.0,
+            "ki": 0.0,
+            "max_integral_error": 10.0
+        },
+        "PID_angular_bicycle":
+        {
             "kp": 0.1,
             "kd": 10.0,
             "ki": 0.0,
             "max_integral_error": 1.0
         },
-        "PID_lateral":
+        "PID_lateral_bicycle":
         {
-            "_comment": "bicycle (0.1, 10, 0); unicycle (1, 0, 0)",
             "kp": 0.1,
             "kd": 10.0,
             "ki": 0.0,
@@ -55,6 +67,8 @@
     {
         "Posture":
         {
+            "_comment": "distance and angular tolerance are not used for now",
+            "_comment2": "angular tolerance is 5°",
             "x": 10.0,
             "y": 1.0,
             "heading": 0.0,
