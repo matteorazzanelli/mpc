@@ -43,6 +43,11 @@ namespace utils {
     };
     using Path = std::vector<PathPoint>;
     using Traj = std::vector<TrajPoint>;
+
+    // the first version is used for posture mission
+    Path toPath(const std::vector<std::vector<double>>& vec);
+    // second one for path and traj mission
+    Path toPath(const std::vector<Position>& vec);
   }
 
   namespace math {
@@ -89,6 +94,8 @@ namespace utils {
     using namespace utils::types;
     void addCurvilinearDistance(Path& path);
     void addCurvature(Path& path);
+    void addOrientation(Path& path);
+    Path toPath(const std::vector<Position>& positions);
     const PathPoint* closestPoint(size_t &index, const Position& point, const Path& path);
     const PathPoint* lookaheadPoint(const PathPoint& start, const PathPoint& end, const Position& robot_position, const Path& path, double ld, const PathPoint& last_lp);
   }
@@ -132,8 +139,10 @@ namespace utils {
     struct Config {
       Simulation simulation;
       Vehicle vehicle;
-      PIDControl pid_ang;
-      PIDControl pid_lat;
+      PIDControl pid_ang_uni;
+      PIDControl pid_lat_uni;
+      PIDControl pid_ang_bi;
+      PIDControl pid_lat_bi;
       PPControl pure_pursuit;
       PostureMission posture;
       PathMission path;

@@ -72,6 +72,41 @@ namespace utils {
   }
   
   namespace path {
+    Path toPath(const std::vector<Position>& positions) {
+      Path p(positions.size());
+      if (positions.empty())
+        throw std::invalid_argument("The given vector is empty!");
+      if (positions.size() < 2)
+        LOG(ERROR) << "Path must be comosed of at least 2 components.";
+      
+      for (size_t i = 0; i < positions.size(); i ++) {
+        p[i] = utils::types::PathPoint {
+          .pose = utils::types::Pose {
+            .position = utils::types::Position {
+              .x = positions[i].x,
+              .y = positions[i].y
+            },
+            .heading = 0.0,
+            .steering_angle = 0.0
+          },
+          .s = 0.0,
+          .k = 0.0
+        };
+      }
+      addCurvilinearDistance(p);
+      addCurvature(p);
+      addOrientation(p);
+      return p;
+    }
+
+    void addOrientation(Path& path) {
+      if (path.empty())
+        throw std::invalid_argument("The given track is empty, can't compute orientation!");
+      for (size_t i = 0; i < path.size() - 1; i++)
+        path[i].pose.heading = utils::math::losAngle(path[i].pose.position, path[i+1].pose.position);
+        path.back().pose.heading = path[path.size() - 2].pose.heading;
+      }
+
     void addCurvilinearDistance(Path& path) {
       CHECK_GE(path.size(),1) << "Path must contain at least 1 element.";
       double distance = 0.0;
@@ -82,7 +117,7 @@ namespace utils {
     }
 
     void addCurvature(Path& path) {
-      CHECK_GE(path.size(),3) << "Path must contain at least 3 elements.";
+      CHECK_GE(path.size(),2) << "Path must contain at least 2 elements.";
       path.front().k = 0.0;
       path.back().k = 0.0;
       double Ax, Ay, Bx, By, Cx, Cy, AB, BC, CA, area;
@@ -145,12 +180,15 @@ namespace utils {
       double t1 = (-b + delta) / (2 * a);
       double t2 = (-b - delta) / (2 * a);
       const PathPoint* pp;
-      if (t1 >= 0 && t1 <= 1)
+      if (t1 >= 0 && t1 <= 1) {
         pp = &end; // FIXME should be an interpolation between start and end
-      else if (t2 >= 0 && t2 <= 1)
+      }
+      else if (t2 >= 0 && t2 <= 1){
         pp = &start; // FIXME should be an interpolation between end and start
-      else 
+      }
+      else {
         pp = &last_lp;
+      }
       return pp;
     }
   }
@@ -175,15 +213,25 @@ namespace utils {
       config.vehicle.steering_angle = json["Vehicle"]["steering_angle"].asDouble();
       config.vehicle.max_control = json["Vehicle"]["max_control"].asDouble();
       
-      config.pid_ang.kp = json["Control"]["PID_angular"]["kp"].asDouble();
-      config.pid_ang.kd = json["Control"]["PID_angular"]["kd"].asDouble();
-      config.pid_ang.ki = json["Control"]["PID_angular"]["ki"].asDouble();
-      config.pid_ang.max_integral_error = json["Control"]["PID_angular"]["max_integral_error"].asDouble();
+      config.pid_ang_uni.kp = json["Control"]["PID_angular_unicycle"]["kp"].asDouble();
+      config.pid_ang_uni.kd = json["Control"]["PID_angular_unicycle"]["kd"].asDouble();
+      config.pid_ang_uni.ki = json["Control"]["PID_angular_unicycle"]["ki"].asDouble();
+      config.pid_ang_uni.max_integral_error = json["Control"]["PID_angular_unicycle"]["max_integral_error"].asDouble();
 
-      config.pid_lat.kp = json["Control"]["PID_lateral"]["kp"].asDouble();
-      config.pid_lat.kd = json["Control"]["PID_lateral"]["kd"].asDouble();
-      config.pid_lat.ki = json["Control"]["PID_lateral"]["ki"].asDouble();
-      config.pid_lat.max_integral_error = json["Control"]["PID_lateral"]["max_integral_error"].asDouble();
+      config.pid_lat_uni.kp = json["Control"]["PID_lateral_unicycle"]["kp"].asDouble();
+      config.pid_lat_uni.kd = json["Control"]["PID_lateral_unicycle"]["kd"].asDouble();
+      config.pid_lat_uni.ki = json["Control"]["PID_lateral_unicycle"]["ki"].asDouble();
+      config.pid_lat_uni.max_integral_error = json["Control"]["PID_lateral_unicycle"]["max_integral_error"].asDouble();
+
+      config.pid_ang_bi.kp = json["Control"]["PID_angular_bicycle"]["kp"].asDouble();
+      config.pid_ang_bi.kd = json["Control"]["PID_angular_bicycle"]["kd"].asDouble();
+      config.pid_ang_bi.ki = json["Control"]["PID_angular_bicycle"]["ki"].asDouble();
+      config.pid_ang_bi.max_integral_error = json["Control"]["PID_angular_bicycle"]["max_integral_error"].asDouble();
+
+      config.pid_lat_bi.kp = json["Control"]["PID_lateral_bicycle"]["kp"].asDouble();
+      config.pid_lat_bi.kd = json["Control"]["PID_lateral_bicycle"]["kd"].asDouble();
+      config.pid_lat_bi.ki = json["Control"]["PID_lateral_bicycle"]["ki"].asDouble();
+      config.pid_lat_bi.max_integral_error = json["Control"]["PID_lateral_bicycle"]["max_integral_error"].asDouble();
 
       config.pure_pursuit.k = json["Control"]["PurePursuit"]["k"].asDouble();
       config.pure_pursuit.ld = json["Control"]["PurePursuit"]["ld"].asDouble();
